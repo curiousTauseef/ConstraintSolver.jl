@@ -24,7 +24,6 @@ function all_different(variables::Vector{Variable})
         MatchingInit(),
         Int[]        
     )
-    constraint.std.hash = constraint_hash(constraint)
     return constraint
 end
 

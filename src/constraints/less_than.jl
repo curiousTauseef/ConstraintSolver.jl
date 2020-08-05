@@ -11,7 +11,6 @@ function Base.:(<=)(x::LinearCombination, y::Real)
     func, T = linear_combination_to_saf(LinearCombination(indices, coeffs))
     lc = LinearConstraint(func, MOI.LessThan{T}(rhs), indices)
 
-    lc.std.hash = constraint_hash(lc)
     return lc
 end
 

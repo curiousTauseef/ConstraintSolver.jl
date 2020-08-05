@@ -15,7 +15,6 @@ function equal(variables::Vector{Variable})
       internals,
       ones(Int, length(variables))
     )
-    constraint.std.hash = constraint_hash(constraint)
     return constraint
 end
 
@@ -37,7 +36,6 @@ function Base.:(==)(x::Variable, y::Variable)
        internals,
        ones(Int, 2)
     )
-    bc.std.hash = constraint_hash(bc)
     return bc
 end
 

@@ -42,7 +42,6 @@ include("lp_model.jl")
 include("MOI_wrapper/MOI_wrapper.jl")
 include("printing.jl")
 include("logs.jl")
-include("hashes.jl")
 include("Variable.jl")
 include("objective.jl")
 include("linearcombination.jl")
@@ -221,19 +220,17 @@ end
     get_next_prune_constraint(com::CS.CoM, constraint_idxs_vec)
 
 Check which function will be called for pruning next. This is based on `constraint_idxs_vec`. The constraint with the lowest
-value is chosen and if two have the same value the constraint hash is checked.
+value is chosen and if two have the same value the first of those constraints is used.
 Return the best value and the constraint index. Return a constraint index of 0 if there is no constraint with a less than maximal value
 """
 function get_next_prune_constraint(com::CS.CoM, constraint_idxs_vec)
     best_ci = 0
     best_open = typemax(Int)
-    best_hash = typemax(UInt64)
     for ci = 1:length(constraint_idxs_vec)
         if constraint_idxs_vec[ci] <= best_open
-            if constraint_idxs_vec[ci] < best_open || com.constraints[ci].std.hash < best_hash
+            if constraint_idxs_vec[ci] < best_open
                 best_ci = ci
                 best_open = constraint_idxs_vec[ci]
-                best_hash = com.constraints[ci].std.hash
             end
         end
     end
@@ -1101,7 +1098,6 @@ function solve!(com::CS.CoM, options::SolverOptions)
     com.start_time = time()
 
     !set_init_fixes!(com) && return :Infeasible
-    set_constraint_hashes!(com)
     set_in_all_different!(com)
 
     # initialize constraints if `init_constraint!` exists for the constraint
@@ -1117,7 +1113,6 @@ function solve!(com::CS.CoM, options::SolverOptions)
     added_con_idxs = simplify!(com)
     if length(added_con_idxs) > 0
         set_in_all_different!(com; constraints=com.constraints[added_con_idxs])
-        set_constraint_hashes!(com; constraints=com.constraints[added_con_idxs])
         set_impl_functions!(com; constraints=com.constraints[added_con_idxs])
         !init_constraints!(com; constraints=com.constraints[added_con_idxs]) && return :Infeasible
     end

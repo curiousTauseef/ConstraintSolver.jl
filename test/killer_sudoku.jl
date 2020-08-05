@@ -225,8 +225,9 @@ end
 
     @testset "Killer Sudoku niallsudoku_5503 with negative coefficients and -9 to -1" begin
         com1 = killer_negative()
-        # the constraint order should not effect anything
-        com2 = killer_negative(;reverse_order=true)
+        # the constraint order should effect something but if it's the same it should not effect the constraint solver
+        # this is due to https://github.com/Wikunia/ConstraintSolver.jl/issues/180
+        com2 = killer_negative()
         info_1 = com1.info
         info_2 = com2.info
         @test info_1.pre_backtrack_calls == info_2.pre_backtrack_calls
